@@ -1,8 +1,8 @@
 /********************************** (C) COPYRIGHT *******************************
  * File Name          : CH58x_NFCA_LIB.h
  * Author             : WCH
- * Version            : V1.3
- * Date               : 2025/05/27
+ * Version            : V1.4
+ * Date               : 2025/06/25
  * Description        : CH585/4 NFC-A头文件
  *********************************************************************************
  * Copyright (c) 2025 Nanjing Qinheng Microelectronics Co., Ltd.
@@ -582,7 +582,7 @@ extern uint8_t nfca_soft_pcd_lib_init(nfca_soft_pcd_config_t *cfg);
 /*******************************************************************************
  * @fn              nfca_soft_pcd_communicate
  *
- * @brief           nfc-a软件解码开始通讯，传输数据
+ * @brief           NFC PCD软件解码开始通讯，传输数据
  *
  * @param           data_bits_num - uint16_t，需要发送的数据区bit数量
  * @param           mode - NFCA_PCD_REC_MODE_Def，发送结束后的接收模式
@@ -595,7 +595,7 @@ extern uint8_t nfca_soft_pcd_communicate(uint16_t data_bits_num, NFCA_PCD_REC_MO
 /*******************************************************************************
  * @fn              nfca_soft_pcd_get_communicate_status
  *
- * @brief           nfc-a获取当前通讯状态
+ * @brief           NFC PCD软件解码获取当前通讯状态
  *
  * @param           None.
  *
@@ -606,7 +606,7 @@ extern nfca_pcd_controller_state_t nfca_soft_pcd_get_communicate_status(void);
 /*******************************************************************************
  * @fn              nfca_soft_pcd_get_recv_data_len
  *
- * @brief           获取本次解码出的数据长度
+ * @brief           NFC PCD软件解码获取本次解码出的数据长度
  *
  * @param           None
  *
@@ -617,7 +617,7 @@ extern uint16_t nfca_soft_pcd_get_recv_data_len(void);
 /*******************************************************************************
  * @fn              nfca_soft_pcd_get_recv_bits
  *
- * @brief           获取本次接收到的bit数量
+ * @brief           NFC PCD软件解码获取本次接收到的bit数量
  *
  * @param           None
  *
@@ -628,7 +628,7 @@ extern uint16_t nfca_soft_pcd_get_recv_bits(void);
 /*******************************************************************************
  * @fn              nfca_soft_pcd_set_wait_ms
  *
- * @brief           NFC设置接收超时时间
+ * @brief           NFC PCD软件解码设置接收超时时间
  *
  * @param           us - uint16_t，超时时间，单位ms，最大38ms。
  *
@@ -639,7 +639,7 @@ extern void nfca_soft_pcd_set_wait_ms(uint8_t ms);
 /*******************************************************************************
  * @fn              nfca_soft_pcd_set_wait_us
  *
- * @brief           NFC设置接收超时时间
+ * @brief           NFC PCD软件解码设置接收超时时间
  *
  * @param           us - uint16_t，超时时间，单位us，最大38000us。
  *

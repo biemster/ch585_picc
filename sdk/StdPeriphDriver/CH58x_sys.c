@@ -16,6 +16,7 @@ volatile MachineMode_Call_func gs_machine_mode_func;
 
 extern uint32_t _vector_base[];
 
+uint32_t chip_info;
 /*********************************************************************
  * @fn      SetSysClock
  *
@@ -31,6 +32,7 @@ void SetSysClock(SYS_CLKTypeDef sc)
     uint16_t clk_sys_cfg;
     uint8_t i;
     uint8_t x32M_c;
+    chip_info = ((*(uint32_t*)ROM_CFG_CHIP_ID));
     R32_SAFE_MODE_CTRL |= RB_XROM_312M_SEL;
     R8_SAFE_MODE_CTRL &= ~RB_SAFE_AUTO_EN;
     sys_safe_access_enable();
@@ -345,7 +347,6 @@ void SYS_DisableAllIrq(uint32_t *pirqv)
     *pirqv = (PFIC->ISR[0] >> 8) | (PFIC->ISR[1] << 24);
     PFIC->IRER[0] = 0xffffffff;
     PFIC->IRER[1] = 0xffffffff;
-    asm volatile("fence.i");
 }
 
 /*********************************************************************
@@ -614,7 +615,7 @@ void *__wrap_memcpy(void *dst, void *src, size_t size)
  *
  * @brief   启动看门狗/解除读保护/喂狗/重装载计数值
  *
- * @param   pr     - IWDG_PR
+ * @param   kr     - IWDG_PR
  *
  * @return  none
  */
@@ -632,9 +633,14 @@ void IWDG_KR_Set(IWDG_KR_Key kr)
  *
  * @return  none
  */
-void IWDG_PR_Set(IWDG_32K_PR pr)
+uint8_t IWDG_PR_Set(IWDG_32K_PR pr)
 {
-    R32_IWDG_CFG |= (pr << 12);
+    if(IWDG_WR_Protect())   return 1;
+    else
+    {
+        R32_IWDG_CFG |= (pr << 12);
+    }
+    return 0;
 }
 
 /*********************************************************************
@@ -646,11 +652,85 @@ void IWDG_PR_Set(IWDG_32K_PR pr)
  *
  * @return  none
  */
-void IWDG_RLR_Set(uint16_t rlr)
+uint8_t IWDG_RLR_Set(uint16_t rlr)
 {
     uint32_t cfg;
 
-    cfg = R32_IWDG_CFG;
-    cfg = (R32_IWDG_CFG & ~0xFFF) | (rlr & 0xFFF);
-    R32_IWDG_CFG = cfg;
+    if(IWDG_WR_Protect())   return 1;
+    else
+    {
+        cfg = R32_IWDG_CFG;
+        cfg = (R32_IWDG_CFG & ~0xFFF) | (rlr & 0xFFF);
+        R32_IWDG_CFG = cfg;
+    }
+    return 0;
 }
+
+/*********************************************************************
+ * @fn      IWDG_FollowCoreStop
+ *
+ * @brief   独立看门狗计数跟随内核停止使能，仅在调试模式下生效
+ *
+ * @param   s       - 是否使能
+ *
+ * @return  none
+ */
+uint8_t IWDG_FollowCoreStop(FunctionalState s)
+{
+    if(IWDG_WR_Protect())   return 1;
+    else
+    {
+        if(s == DISABLE)
+        {
+            R32_IWDG_CFG &= ~(1<<29);
+        }
+        else
+        {
+            R32_IWDG_CFG |= (1<<29);
+        }
+    }
+    return 0;
+}
+
+/*********************************************************************
+ * @fn      IWDG_Enable
+ *
+ * @brief   独立看门狗使能
+ *
+ * @param   pr     - 预分频
+ *          rlr    - 计数器重装载值，最大值为0xFFF
+ *
+ * @return  none
+ */
+uint8_t IWDG_Enable(IWDG_32K_PR pr, uint16_t rlr)
+{
+    uint8_t state;
+
+    sys_safe_access_enable();
+    R8_SAFE_LRST_CTRL |= RB_IWDG_RST_EN;  //看门狗复位为上电复位。若改为全局复位，需保证LSI不被关闭
+    sys_safe_access_disable();
+
+    IWDG_KR_Set(KEY_START_IWDG);
+    IWDG_KR_Set(KEY_UNPROTECT);
+    state = IWDG_PR_Set(pr);
+    if(state)  return 1;
+    state = IWDG_RLR_Set(rlr);
+    if(state)  return 1;
+
+    return 0;
+}
+
+/*********************************************************************
+ * @fn      IWDG_Feed
+ *
+ * @brief   系统必须定期重装载看门狗计数值以防止复位
+ *
+ * @param   none
+ *
+ * @return  none
+ */
+void IWDG_Feed(void)
+{
+    IWDG_KR_Set(KEY_RELOADING_COUNT);
+}
+

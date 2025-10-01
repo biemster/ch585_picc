@@ -1243,7 +1243,9 @@ extern "C" {
 #define  RB_PWM_IF_CYC      0x80                      // RW1, interrupt flag for PWM cycle end
 #define R32_PWM_REG_DATA8   (*((PUINT32V)0x40005010)) // RW, PWM8-9 data register
 #define R16_PWM8_DATA       (*((PUINT16V)0x40005010)) // RW, PWM8 16bit data holding
+#define R16_PWM8_REG_DATA   (*((PUINT16V)0x40005010)) // RW, PWM8 16bit data holding
 #define R16_PWM9_DATA       (*((PUINT16V)0x40005012)) // RW, PWM9 16bit data holding
+#define R16_PWM9_REG_DATA   (*((PUINT16V)0x40005012)) // RW, PWM9 16bit data holding
 #define R32_PWM_REG_CYCLE   (*((PUINT32V)0x40005014)) // RW, PWM cycle value
 
 /* PWM4/5/6/7/8/9/10/11 register address offset and bit define */
@@ -1344,6 +1346,7 @@ extern "C" {
 /* Special Program Space */
 #define DATA_FLASH_ADDR     0x70000                   // start address of Data-Flash
 #define DATA_FLASH_SIZE     0x8000                    // size of Data-Flash
+#define DATA_FLASH_SIZE_584X     0x80000              // size of 584X Data-Flash, only accessible through libISP585
 #define BOOT_LOAD_ADDR      0x78000                   // start address of boot loader program
 #define BOOT_LOAD_SIZE      0x6000                    // size of boot loader program
 #define BOOT_LOAD_CFG       0x7E000                   // start address of configuration information for boot loader program
@@ -2201,9 +2204,9 @@ typedef UDISK_BOC_CSW  *PXUDISK_BOC_CSW;
 #define USBHS_UEP_R_NAK_TOG         0x20
 #define USBHS_UEP_R_TOG_MATCH       0x10
 #define USBHS_UEP_R_SETUP_IS        0x08
-#define USBHS_UEP_R_TOG_MASK        0x0C
-#define USBHS_UEP_R_TOG_MDATA       0x0C
-#define USBHS_UEP_R_TOG_DATA2       0x08
+#define USBHS_UEP_R_TOG_MASK        0x04
+//#define USBHS_UEP_R_TOG_MDATA       0x0C
+//#define USBHS_UEP_R_TOG_DATA2       0x08
 #define USBHS_UEP_R_TOG_DATA1       0x04
 #define USBHS_UEP_R_TOG_DATA0       0x00
 #define USBHS_UEP_R_RES_MASK        0x03

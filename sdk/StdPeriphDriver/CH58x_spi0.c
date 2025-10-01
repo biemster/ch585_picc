@@ -114,7 +114,7 @@ void SPI0_MasterSendByte(uint8_t d)
  */
 uint8_t SPI0_MasterRecvByte(void)
 {
-    R8_SPI0_CTRL_MOD &= ~RB_SPI_FIFO_DIR;
+    R8_SPI0_CTRL_MOD |= RB_SPI_FIFO_DIR;
     R8_SPI0_BUFFER = 0xFF; // Æô¶¯´«Êä
     while(!(R8_SPI0_INT_FLAG & RB_SPI_FREE));
     return (R8_SPI0_BUFFER);
