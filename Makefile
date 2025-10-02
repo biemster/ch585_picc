@@ -67,9 +67,8 @@ SECONDARY_LIST := main.lst
 SECONDARY_SIZE := main.siz
 SECONDARY_BIN := main.bin
 
-# ARCH is rv32imac on older gcc, rv32imac_zicsr on newer gcc
-# ARCH := rv32imac
-ARCH := rv32imac_zicsr
+# ARCH := rv32imac_zicsr_zifencei
+ARCH := rv32imc_zba_zbb_zbc_zbs_xw
 
 CFLAGS_COMMON := \
   -march=$(ARCH) \
@@ -81,7 +80,9 @@ CFLAGS_COMMON := \
   -fmessage-length=0 \
   -fsigned-char \
   -ffunction-sections \
-  -fdata-sections
+  -fdata-sections \
+  -fno-common \
+  --param=highcode-gen-section-name=1
   #-g
 
 .PHONY: all
@@ -139,7 +140,7 @@ obj/%.o: ./%.c
 	@ mkdir --parents $(dir $@)
 	@ ${TOOLCHAIN_PREFIX}-gcc \
 	    $(CFLAGS_COMMON) \
-	    -DDEBUG \
+	    -DDEBUG=0 \
 	    -I"src/include" \
 	    -I"sdk/StdPeriphDriver/inc" \
 	    -I"sdk/RVMSIS" \
@@ -166,8 +167,7 @@ obj/%.o: ./%.S
 	    -c \
 	    -o "$@" "$<"
 
-f: clean all
-	chprog main.bin
+f: clean all flash
 
 flash: 
 	chprog main.bin

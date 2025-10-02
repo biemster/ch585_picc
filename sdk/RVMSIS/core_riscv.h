@@ -640,10 +640,16 @@ __attribute__((always_inline)) RV_STATIC_INLINE uint32_t __get_SP(void)
  *
  * @return  None.
  */
-__attribute__((always_inline)) RV_STATIC_INLINE void __MCPY(void *dst, void *start, void *end)
-{
-    __asm volatile("mcpy %2, %0, %1" : \
-                   "+r"(start), "+r"(dst) : "r"(end) : "memory");
+//__attribute__((always_inline)) RV_STATIC_INLINE void __MCPY(void *dst, void *start, void *end)
+//{
+//    __asm volatile("mcpy %2, %0, %1" : \
+//                   "+r"(start), "+r"(dst) : "r"(end) : "memory");
+//}
+__attribute__((always_inline)) RV_STATIC_INLINE void __MCPY(void *dst, void *start, void *end) {
+    __asm__ volatile (".insn r 0x0f, 0x7, 0, x0, %3, %0, %1"
+          : "+r"(start), "+r"(dst)
+          :  "r"(0), "r"(end)
+          : "memory");
 }
 
 #define SysTick_SR_SWIE             (1 << 31)

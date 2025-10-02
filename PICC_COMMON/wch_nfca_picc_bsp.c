@@ -149,7 +149,8 @@ uint32_t nfca_picc_rand(void)
  * 可能导致设备无法成功通讯，有的读卡器设备对时间要求低，就没有这个问题。一般手机读卡要求高。 */
 /* 由于信号频繁，且函数处理流程复杂，所以该中断函数在接收数据期间会一直停留在中断中，
  * 在处理完数据开始发送数据后，退出中断，停止接收。等到TMR3中断中会重新打开接收。 */
-__attribute__((interrupt("WCH-Interrupt-fast")))
+// __attribute__((interrupt("WCH-Interrupt-fast")))
+__INTERRUPT
 __attribute__((section(".highcode")))
 void TMR0_IRQHandler(void)
 {
@@ -158,7 +159,8 @@ void TMR0_IRQHandler(void)
 
 /* TIMER3 中断函数必须是最高优先级，不被打断，运行期间关闭中断不可以超过80us。  */
 /* 由于NFC协议规定，从机回复结束后，在最小时间80us左右主机可能会有下一步回复，所以如果关闭中断超过80us，而读卡器发送信号很快，则无法成功接收 */
-__attribute__((interrupt("WCH-Interrupt-fast")))
+// __attribute__((interrupt("WCH-Interrupt-fast")))
+__INTERRUPT
 __attribute__((section(".highcode")))
 void TMR3_IRQHandler(void)
 {
