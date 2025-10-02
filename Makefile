@@ -2,8 +2,8 @@
 
 # Prefix for older riscv gcc is  risv-none-embed
 # Prefix for newer riscv gcc is  risv-none-elf
-# TOOLCHAIN_PREFIX := riscv-none-embed
-TOOLCHAIN_PREFIX := ../../MRS_Toolchain_Linux_x64_V210/RISC-V_Embedded_GCC12/bin/riscv-wch-elf
+TOOLCHAIN_PREFIX := riscv64-elf
+# TOOLCHAIN_PREFIX := ../../MRS_Toolchain_Linux_x64_V210/RISC-V_Embedded_GCC12/bin/riscv-wch-elf
 
 
 APP_C_SRCS += \
@@ -67,8 +67,8 @@ SECONDARY_LIST := main.lst
 SECONDARY_SIZE := main.siz
 SECONDARY_BIN := main.bin
 
-# ARCH := rv32imac_zicsr_zifencei
-ARCH := rv32imc_zba_zbb_zbc_zbs_xw
+ARCH := rv32imac_zicsr_zifencei
+# ARCH := rv32imc_zba_zbb_zbc_zbs_xw
 
 CFLAGS_COMMON := \
   -march=$(ARCH) \
@@ -81,8 +81,8 @@ CFLAGS_COMMON := \
   -fsigned-char \
   -ffunction-sections \
   -fdata-sections \
-  -fno-common \
-  --param=highcode-gen-section-name=1
+  -fno-common
+  #--param=highcode-gen-section-name=1
   #-g
 
 .PHONY: all
@@ -140,6 +140,7 @@ obj/%.o: ./%.c
 	@ mkdir --parents $(dir $@)
 	@ ${TOOLCHAIN_PREFIX}-gcc \
 	    $(CFLAGS_COMMON) \
+	    -DINT_SOFT \
 	    -DDEBUG=0 \
 	    -I"src/include" \
 	    -I"sdk/StdPeriphDriver/inc" \
