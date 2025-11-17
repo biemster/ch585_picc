@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-#include "CH58x_common.h"
+// #include "CH58x_common.h"
 
 /********************************** CH58x NFC-A PCD ******************************************/
 typedef enum
