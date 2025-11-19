@@ -8,6 +8,9 @@
 #define NFCA_PICC_RSP_POLAR  0
 
 #define RB_TMR_FREQ_13_56    0x20
+#define R8_NFC_CMD           (*(vu8*)0x4000E000)
+#define R32_NFC_DRV          (*(vu32*)0x4000E014)
+
 
 static uint32_t gs_picc_signal_buf[PICC_SIGNAL_BUF_LEN];
 __attribute__((aligned(4))) uint8_t g_picc_data_buf[PICC_DATA_BUF_LEN];
@@ -62,7 +65,16 @@ void TMR0_IRQHandler(void) {
 __INTERRUPT
 __HIGH_CODE
 void TMR3_IRQHandler(void) {
-    nfca_picc_tx_irq_handler();
+	R8_TMR3_INT_FLAG = R8_TMR3_INT_FLAG;
+	R8_TMR3_CTRL_DMA = 0;
+	R32_TMR3_DMA_END = R32_TMR3_DMA_NOW + 0x100;
+	
+	R32_TMR0_CNT_END = 0x120;
+	R8_TMR0_CTRL_DMA = RB_TMR_DMA_LOOP | RB_TMR_DMA_ENABLE;
+	R8_TMR0_CTRL_MOD = 0xe5;
+
+	NVIC_ClearPendingIRQ(TMR3_IRQn);
+	return;
 }
 
 void nfca_picc_init() {
@@ -89,7 +101,9 @@ void nfca_picc_init() {
 }
 
 void nfca_picc_start() {
-	nfca_picc_lib_start();
+	R8_NFC_CMD = 0x48;
+	R32_NFC_DRV = (R32_NFC_DRV & 0xf9cf) | 0x620;
+
 	R8_TMR3_CTRL_MOD = RB_TMR_ALL_CLEAR;
 
 #if NFCA_PICC_RSP_POLAR != 0
